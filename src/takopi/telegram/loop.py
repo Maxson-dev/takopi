@@ -168,6 +168,8 @@ async def _resolve_engine_run_options(
 
 
 def _allowed_chat_ids(cfg: TelegramBridgeConfig) -> set[int]:
+    if cfg.only_configured_chat:
+        return {cfg.chat_id}
     allowed = set(cfg.chat_ids or ())
     allowed.add(cfg.chat_id)
     allowed.update(cfg.runtime.project_chat_ids())
@@ -1865,6 +1867,13 @@ async def run_main_loop(
             allowed_user_ids = set(cfg.allowed_user_ids)
 
             async def route_update(update: TelegramIncomingUpdate) -> None:
+                if cfg.only_configured_chat and update.chat_id != cfg.chat_id:
+                    logger.debug(
+                        "update.ignored",
+                        reason="chat_not_configured",
+                        chat_id=update.chat_id,
+                    )
+                    return
                 if allowed_user_ids:
                     sender_id = update.sender_id
                     if sender_id is None or sender_id not in allowed_user_ids:

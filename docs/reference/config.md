@@ -49,6 +49,7 @@ If you expect to edit config while Takopi is running, set:
 | `startup_thread_id` | int/null | `null` | Topic ID for the startup message in the main chat; null keeps the upstream destination. |
 | `general_trigger_mode` | "all" / "mentions" / null | `null` | Override General (thread absent or 1) in the main chat when topics are enabled. Takes precedence over `/trigger`; other topics retain normal chat/topic settings. |
 | `allowed_user_ids` | int[] | `[]` | Allowed sender user ids. Empty disables sender filtering; when set, only these users can interact (including DMs). |
+| `only_configured_chat` | bool | `false` | Accept updates only from the configured `chat_id`; use with an empty `allowed_user_ids` to allow every member of that one group while rejecting DMs and other chats. |
 | `message_overflow` | `"trim"`\|`"split"` | `"trim"` | How to handle long final responses. |
 | `forward_coalesce_s` | float | `1.0` | Quiet window for combining a prompt with immediately-following forwarded messages; set `0` to disable. |
 | `voice_transcription` | bool | `false` | Enable voice note transcription. |

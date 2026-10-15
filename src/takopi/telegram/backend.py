@@ -145,6 +145,7 @@ class TelegramBackend(TransportBackend):
             forward_coalesce_s=settings.forward_coalesce_s,
             media_group_debounce_s=settings.media_group_debounce_s,
             allowed_user_ids=tuple(settings.allowed_user_ids),
+            only_configured_chat=settings.only_configured_chat,
             topics=settings.topics,
             files=settings.files,
         )

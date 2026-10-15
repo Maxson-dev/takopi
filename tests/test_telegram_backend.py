@@ -143,6 +143,7 @@ def test_telegram_backend_build_and_run_wires_config(
         startup_thread_id=20,
         general_trigger_mode="mentions",
         allowed_user_ids=[7, 8],
+        only_configured_chat=True,
         voice_transcription=True,
         voice_max_bytes=1234,
         voice_transcription_model="whisper-1",
@@ -171,6 +172,7 @@ def test_telegram_backend_build_and_run_wires_config(
     assert cfg.voice_transcription_base_url == "http://localhost:8000/v1"
     assert cfg.voice_transcription_api_key == "local"
     assert cfg.allowed_user_ids == (7, 8)
+    assert cfg.only_configured_chat is True
     assert cfg.files.enabled is True
     assert cfg.files.allowed_user_ids == [1, 2]
     assert cfg.topics.enabled is True

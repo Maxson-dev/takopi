@@ -1166,6 +1166,37 @@ def test_allowed_chat_ids_include_allowed_user_ids() -> None:
     assert 42 in allowed
 
 
+def test_allowed_chat_ids_can_be_limited_to_configured_chat() -> None:
+    cfg = replace(
+        make_cfg(FakeTransport()),
+        chat_ids=(456,),
+        only_configured_chat=True,
+    )
+
+    assert telegram_loop._allowed_chat_ids(cfg) == {cfg.chat_id}
+
+
+@pytest.mark.anyio
+async def test_run_main_loop_ignores_other_chats_even_without_user_filter() -> None:
+    runner = ScriptRunner([Return(answer="ok")], engine=CODEX_ENGINE)
+    cfg = replace(make_cfg(FakeTransport(), runner), only_configured_chat=True)
+
+    async def poller(_cfg: TelegramBridgeConfig):
+        yield TelegramIncomingMessage(
+            transport="telegram",
+            chat_id=456,
+            message_id=1,
+            text="hello",
+            reply_to_message_id=None,
+            reply_to_text=None,
+            sender_id=777,
+        )
+
+    await run_main_loop(cfg, poller)
+
+    assert runner.calls == []
+
+
 @pytest.mark.anyio
 async def test_run_main_loop_ignores_disallowed_sender() -> None:
     runner = ScriptRunner([Return(answer="ok")], engine=CODEX_ENGINE)

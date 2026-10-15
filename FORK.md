@@ -3,13 +3,14 @@
 Based on upstream Takopi v0.23.4 (`e0123d4`). The package version is
 `0.23.4+maxson.1`. `origin` is this fork; `upstream` is `banteg/takopi`.
 
-This fork adds two optional Telegram settings, with unchanged upstream defaults:
+This fork adds three optional Telegram settings, with unchanged upstream defaults:
 
 ```toml
 [transports.telegram]
 # Existing bot_token, chat_id and allowed_user_ids stay here.
 startup_thread_id = 20
 general_trigger_mode = "mentions"
+only_configured_chat = true
 
 [transports.telegram.topics]
 enabled = true
@@ -20,6 +21,9 @@ chat. `general_trigger_mode` overrides General (no thread ID or ID 1) only in
 the main chat with topics enabled. Other topics use the existing chat/topic
 trigger state. To auto-reply in them, clear the old chat-level `mentions` and
 any per-topic `mentions` overrides. `/trigger` reports the effective mode.
+`only_configured_chat` restricts polling and update routing to `chat_id`. With
+`allowed_user_ids = []`, every member of that one group can use the bot, while
+DMs and other chats are ignored.
 No chat IDs, tokens or deployment-specific topic IDs are embedded in code.
 
 ## Development and deployment
