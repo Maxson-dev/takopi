@@ -132,6 +132,8 @@ class TelegramBackend(TransportBackend):
             runtime=runtime,
             chat_id=chat_id,
             startup_msg=startup_msg,
+            startup_thread_id=settings.startup_thread_id,
+            general_trigger_mode=settings.general_trigger_mode,
             exec_cfg=exec_cfg,
             session_mode=settings.session_mode,
             show_resume_line=settings.show_resume_line,

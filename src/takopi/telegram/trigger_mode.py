@@ -17,7 +17,10 @@ async def resolve_trigger_mode(
     thread_id: int | None,
     chat_prefs: ChatPrefsStore | None,
     topic_store: TopicStateStore | None,
+    general_trigger_mode: TriggerMode | None = None,
 ) -> TriggerMode:
+    if general_trigger_mode is not None and thread_id in (None, 1):
+        return general_trigger_mode
     if topic_store is not None and thread_id is not None:
         topic_mode = await topic_store.get_trigger_mode(chat_id, thread_id)
         if topic_mode == "mentions":

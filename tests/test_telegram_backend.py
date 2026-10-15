@@ -140,6 +140,8 @@ def test_telegram_backend_build_and_run_wires_config(
     transport_config = TelegramTransportSettings(
         bot_token="token",
         chat_id=321,
+        startup_thread_id=20,
+        general_trigger_mode="mentions",
         allowed_user_ids=[7, 8],
         voice_transcription=True,
         voice_max_bytes=1234,
@@ -161,6 +163,8 @@ def test_telegram_backend_build_and_run_wires_config(
     cfg = captured["cfg"]
     kwargs = captured["kwargs"]
     assert cfg.chat_id == 321
+    assert cfg.startup_thread_id == 20
+    assert cfg.general_trigger_mode == "mentions"
     assert cfg.voice_transcription is True
     assert cfg.voice_max_bytes == 1234
     assert cfg.voice_transcription_model == "whisper-1"
@@ -183,3 +187,29 @@ def test_telegram_files_settings_defaults() -> None:
     assert cfg.auto_put_mode == "upload"
     assert cfg.uploads_dir == "incoming"
     assert cfg.allowed_user_ids == []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("thread_id", [None, 20])
+async def test_startup_routes_to_configured_topic(thread_id: int | None) -> None:
+    from dataclasses import replace
+
+    from takopi.telegram.loop import _send_startup
+    from tests.telegram_fakes import FakeTransport, make_cfg
+
+    transport = FakeTransport()
+    cfg = replace(make_cfg(transport), startup_thread_id=thread_id)
+    await _send_startup(cfg)
+    assert len(transport.send_calls) == 1
+    assert transport.send_calls[0]["channel_id"] == cfg.chat_id
+    assert transport.send_calls[0]["options"].thread_id == thread_id
+
+
+@pytest.mark.parametrize("thread_id", [0, -1, True, "20"])
+def test_startup_thread_id_rejects_invalid_values(thread_id) -> None:
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        TelegramTransportSettings(
+            bot_token="token", chat_id=-123, startup_thread_id=thread_id
+        )

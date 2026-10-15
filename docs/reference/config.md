@@ -46,6 +46,8 @@ If you expect to edit config while Takopi is running, set:
 |-----|------|---------|-------|
 | `bot_token` | string | (required) | Telegram bot token from @BotFather. |
 | `chat_id` | int | (required) | Default chat id. |
+| `startup_thread_id` | int/null | `null` | Topic ID for the startup message in the main chat; null keeps the upstream destination. |
+| `general_trigger_mode` | "all" / "mentions" / null | `null` | Override General (thread absent or 1) in the main chat when topics are enabled. Takes precedence over `/trigger`; other topics retain normal chat/topic settings. |
 | `allowed_user_ids` | int[] | `[]` | Allowed sender user ids. Empty disables sender filtering; when set, only these users can interact (including DMs). |
 | `message_overflow` | `"trim"`\|`"split"` | `"trim"` | How to handle long final responses. |
 | `forward_coalesce_s` | float | `1.0` | Quiet window for combining a prompt with immediately-following forwarded messages; set `0` to disable. |

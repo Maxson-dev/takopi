@@ -1,7 +1,7 @@
 [project]
 name = "takopi"
 authors = [{name = "banteg"}]
-version = "0.23.4"
+version = "0.23.4+maxson.1"
 description = "Telegram bridge for Codex, Claude Code, and other agent CLIs."
 readme = "readme.md"
 license = { file = "LICENSE" }
@@ -31,10 +31,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/banteg/takopi"
+Homepage = "https://github.com/Maxson-dev/takopi"
 Documentation = "https://takopi.dev/"
-Repository = "https://github.com/banteg/takopi"
-Issues = "https://github.com/banteg/takopi/issues"
+Repository = "https://github.com/Maxson-dev/takopi"
+Issues = "https://github.com/Maxson-dev/takopi/issues"
 
 [project.scripts]
 takopi = "takopi.cli:main"

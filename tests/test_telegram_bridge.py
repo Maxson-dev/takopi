@@ -3935,8 +3935,9 @@ async def test_run_main_loop_refreshes_command_ids(monkeypatch) -> None:
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("general_override", [False, True])
 async def test_run_main_loop_mentions_only_skips_voice_and_files(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, general_override
 ) -> None:
     calls = {"voice": 0, "file": 0}
 
@@ -3974,6 +3975,8 @@ async def test_run_main_loop_mentions_only_skips_voice_and_files(
         runtime=runtime,
         chat_id=123,
         startup_msg="",
+        general_trigger_mode="mentions" if general_override else None,
+        topics=TelegramTopicsSettings(enabled=general_override, scope="main"),
         exec_cfg=exec_cfg,
         forward_coalesce_s=FAST_FORWARD_COALESCE_S,
         media_group_debounce_s=FAST_MEDIA_GROUP_DEBOUNCE_S,
@@ -3982,7 +3985,8 @@ async def test_run_main_loop_mentions_only_skips_voice_and_files(
     )
 
     prefs = ChatPrefsStore(resolve_prefs_path(config_path))
-    await prefs.set_trigger_mode(123, "mentions")
+    if not general_override:
+        await prefs.set_trigger_mode(123, "mentions")
 
     voice = TelegramVoice(
         file_id="voice-id",

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from takopi.config import ProjectConfig, ProjectsConfig
 from takopi.ids import RESERVED_CHAT_COMMANDS
 from takopi.router import AutoRouter, RunnerEntry
@@ -135,4 +137,52 @@ def test_should_trigger_run_ignores_unknown_commands() -> None:
         runtime=runtime,
         command_ids=set(),
         reserved_chat_commands=set(RESERVED_CHAT_COMMANDS),
+    )
+
+
+@pytest.mark.anyio
+async def test_general_override_preserves_topic_defaults(tmp_path: Path) -> None:
+    from takopi.telegram.chat_prefs import ChatPrefsStore
+    from takopi.telegram.topic_state import TopicStateStore
+    from takopi.telegram.trigger_mode import resolve_trigger_mode
+
+    prefs = ChatPrefsStore(tmp_path / "chats.json")
+    topics = TopicStateStore(tmp_path / "topics.json")
+    await topics.set_trigger_mode(-123, 30, "mentions")
+    for thread, expected in (
+        (None, "mentions"),
+        (1, "mentions"),
+        (20, "all"),
+        (30, "mentions"),
+        (999999, "all"),
+    ):
+        assert (
+            await resolve_trigger_mode(
+                chat_id=-123,
+                thread_id=thread,
+                chat_prefs=prefs,
+                topic_store=topics,
+                general_trigger_mode="mentions",
+            )
+            == expected
+        )
+    assert (
+        await resolve_trigger_mode(
+            chat_id=-123,
+            thread_id=None,
+            chat_prefs=prefs,
+            topic_store=topics,
+        )
+        == "all"
+    )
+    await prefs.set_trigger_mode(-123, "mentions")
+    assert (
+        await resolve_trigger_mode(
+            chat_id=-123,
+            thread_id=20,
+            chat_prefs=prefs,
+            topic_store=topics,
+            general_trigger_mode="all",
+        )
+        == "mentions"
     )

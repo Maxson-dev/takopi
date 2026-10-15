@@ -62,6 +62,11 @@ async def _plan_trigger_command(
             thread_id=msg.thread_id,
             chat_prefs=chat_prefs,
             topic_store=topic_store,
+            general_trigger_mode=(
+                cfg.general_trigger_mode
+                if cfg.topics.enabled and msg.chat_id == cfg.chat_id
+                else None
+            ),
         )
         topic_mode = None
         if tkey is not None and topic_store is not None:
@@ -69,7 +74,14 @@ async def _plan_trigger_command(
         chat_mode = None
         if chat_prefs is not None:
             chat_mode = await chat_prefs.get_trigger_mode(msg.chat_id)
-        if topic_mode is not None:
+        if (
+            cfg.topics.enabled
+            and msg.chat_id == cfg.chat_id
+            and msg.thread_id in (None, 1)
+            and cfg.general_trigger_mode is not None
+        ):
+            source = "general_trigger_mode config"
+        elif topic_mode is not None:
             source = "topic override"
         elif chat_mode is not None:
             source = "chat default"

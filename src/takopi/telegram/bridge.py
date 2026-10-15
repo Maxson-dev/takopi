@@ -138,6 +138,8 @@ class TelegramBridgeConfig:
     chat_id: int
     startup_msg: str
     exec_cfg: ExecBridgeConfig
+    startup_thread_id: int | None = None
+    general_trigger_mode: Literal["all", "mentions"] | None = None
     session_mode: Literal["stateless", "chat"] = "stateless"
     show_resume_line: bool = True
     voice_transcription: bool = False

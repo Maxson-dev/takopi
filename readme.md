@@ -1,3 +1,5 @@
+> **Maxson-dev fork.** Deployment and fork-specific settings: [FORK.md](FORK.md). Upstream: [banteg/takopi](https://github.com/banteg/takopi).
+
 # takopi
 
 🐙 *he just wants to help-pi*

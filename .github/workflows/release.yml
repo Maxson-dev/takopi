@@ -66,6 +66,7 @@ jobs:
           if-no-files-found: error
 
   publish:
+    if: github.repository == 'banteg/takopi'
     name: Publish to PyPI (trusted publishing)
     needs: build
     runs-on: ubuntu-latest

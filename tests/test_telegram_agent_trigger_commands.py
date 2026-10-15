@@ -282,3 +282,34 @@ async def test_trigger_chat_prefs_unavailable() -> None:
     )
 
     assert "chat trigger settings are unavailable" in _last_text(transport)
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "chat_id,thread_id,enabled,expected",
+    [
+        (123, None, True, "mentions"),
+        (123, 1, True, "mentions"),
+        (123, 20, True, "all"),
+        (456, None, True, "all"),
+        (123, None, False, "all"),
+    ],
+)
+async def test_general_trigger_setting_scope(chat_id, thread_id, enabled, expected):
+    transport = FakeTransport()
+    cfg = replace(
+        make_cfg(transport),
+        general_trigger_mode="mentions",
+        topics=TelegramTopicsSettings(enabled=enabled, scope="all"),
+    )
+    await _handle_trigger_command(
+        cfg,
+        _msg("/trigger", chat_id=chat_id, thread_id=thread_id, chat_type="supergroup"),
+        args_text="",
+        _ambient_context=None,
+        topic_store=None,
+        chat_prefs=None,
+    )
+    assert f"trigger: {expected}" in _last_text(transport)
+    if expected == "mentions":
+        assert "general_trigger_mode config" in _last_text(transport)

@@ -187,9 +187,10 @@ async def _send_startup(cfg: TelegramBridgeConfig) -> None:
     sent = await cfg.exec_cfg.transport.send(
         channel_id=cfg.chat_id,
         message=message,
+        options=SendOptions(thread_id=cfg.startup_thread_id),
     )
     if sent is not None:
-        logger.info("startup.sent", chat_id=cfg.chat_id)
+        logger.info("startup.sent", chat_id=cfg.chat_id, thread_id=sent.thread_id)
 
 
 def _dispatch_builtin_command(
@@ -851,6 +852,12 @@ class MediaGroupBuffer:
                 thread_id=messages[0].thread_id,
                 chat_prefs=self._chat_prefs,
                 topic_store=self._topic_store,
+                general_trigger_mode=(
+                    self._cfg.general_trigger_mode
+                    if self._cfg.topics.enabled
+                    and messages[0].chat_id == self._cfg.chat_id
+                    else None
+                ),
             )
             command_ids = self._command_ids()
             if trigger_mode == "mentions" and not any(
@@ -1725,6 +1732,11 @@ async def run_main_loop(
                     thread_id=msg.thread_id,
                     chat_prefs=state.chat_prefs,
                     topic_store=state.topic_store,
+                    general_trigger_mode=(
+                        cfg.general_trigger_mode
+                        if cfg.topics.enabled and chat_id == cfg.chat_id
+                        else None
+                    ),
                 )
                 if trigger_mode == "mentions" and not should_trigger_run(
                     msg,
